@@ -9,6 +9,9 @@ from torch.autograd import Variable
 from torchnet import meter
 from utils.visualize import Visualizer
 from tqdm import tqdm
+from torch.nn import DataParallel
+import sys
+import torch
 
 
 def test(**kwargs):
@@ -17,10 +20,11 @@ def test(**kwargs):
     ipdb.set_trace()
     # configure model
     model = getattr(models, opt.model)().eval()
+
     if opt.load_model_path:
         model.load(opt.load_model_path)
     if opt.use_gpu: model.cuda()
-
+    model = DataParallel(model, device_ids=[0,1,2,3])
     # data
     train_data = DogCat(opt.test_data_root, test=True)
     test_dataloader = DataLoader(train_data, batch_size=opt.batch_size, shuffle=False, num_workers=opt.num_workers)
@@ -58,7 +62,11 @@ def train(**kwargs):
         model.load(opt.load_model_path)
     if opt.use_gpu: model.cuda()
 
+    # MulGPU
+    model = models.MulGPUDataParallel(model, device_ids=[0,1,2,3])
+
     # step2: data
+    # model.load = models.BasicModule.load()
     train_data = DogCat(opt.train_data_root, train=True)
     val_data = DogCat(opt.train_data_root, train=False)
     train_dataloader = DataLoader(train_data, opt.batch_size,
@@ -120,13 +128,14 @@ def train(**kwargs):
             lr=lr))
 
         # update learning rate
-        if loss_meter.value()[0] > previous_loss:
+        # torch.gt
+        if torch.gt(loss_meter.value()[0], previous_loss):
             lr = lr * opt.lr_decay
             # 第二种降低学习率的方法:不会有moment等信息的丢失
             for param_group in optimizer.param_groups:
                 param_group['lr'] = lr
 
-        previous_loss = loss_meter.value()[0]
+        previous_loss =loss_meter.value()[0]
 
 
 def val(model, dataloader):
@@ -137,8 +146,9 @@ def val(model, dataloader):
     confusion_matrix = meter.ConfusionMeter(2)
     for ii, data in enumerate(dataloader):
         input, label = data
-        val_input = Variable(input, volatile=True)
-        val_label = Variable(label.type(t.LongTensor), volatile=True)
+        with torch.no_grad():
+            val_input = Variable(input)
+            val_label = Variable(label.type(t.LongTensor), volatile=True)
         if opt.use_gpu:
             val_input = val_input.cuda()
             val_label = val_label.cuda()

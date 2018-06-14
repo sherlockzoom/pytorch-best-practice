@@ -1,6 +1,11 @@
 #coding:utf8
 import torch as t
 import time
+from torch.nn import DataParallel
+
+"""
+基本网络结构模块，可以在此添加自定义的网络结构，也可以扩展BasicModule接口
+"""
 
 
 class BasicModule(t.nn.Module):
@@ -27,6 +32,8 @@ class BasicModule(t.nn.Module):
             name = time.strftime(prefix + '%m%d_%H:%M:%S.pth')
         t.save(self.state_dict(), name)
         return name
+
+
 
 
 class Flat(t.nn.Module):
