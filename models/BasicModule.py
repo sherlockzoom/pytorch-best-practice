@@ -5,7 +5,7 @@ import time
 
 class BasicModule(t.nn.Module):
     '''
-    封装了nn.Module,主要是提供了save和load两个方法
+    封装了nn.Module,主要是提供了save和load两个方法, 顶层定义 通用接口
     '''
 
     def __init__(self):

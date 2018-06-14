@@ -1,3 +1,8 @@
++ python3.5
++ pytorch 0.4
+
+---
+
 # PyTorch 实践指南 
 
 
