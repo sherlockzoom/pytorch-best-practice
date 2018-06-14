@@ -2,6 +2,7 @@
 from .BasicModule import BasicModule
 from torch import nn
 from torch.nn import functional as F
+from torch.nn import DataParallel
 
 class ResidualBlock(nn.Module):
     '''
@@ -73,5 +74,6 @@ class ResNet34(BasicModule):
         x = self.layer4(x)
 
         x = F.avg_pool2d(x, 7)
+        # x = DataParallel(x, device_ids=[0,1,2,3])
         x = x.view(x.size(0), -1)
         return self.fc(x)
