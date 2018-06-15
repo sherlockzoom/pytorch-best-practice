@@ -1,6 +1,10 @@
 + python3.5
 + pytorch 0.4
 
+> 4GPU运行，batch_size过大可能出现溢出 
+
+![](data/gpustat.png)
+
 ---
 
 # PyTorch 实践指南 

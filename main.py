@@ -106,7 +106,7 @@ def train(**kwargs):
             optimizer.step()
 
             # meters update and visualize
-            loss_meter.add(loss.data[0])
+            loss_meter.add(loss.item())
             confusion_matrix.add(score.data, target.data)
 
             if ii % opt.print_freq == opt.print_freq - 1:
@@ -129,7 +129,7 @@ def train(**kwargs):
 
         # update learning rate
         # torch.gt
-        if torch.gt(loss_meter.value()[0], previous_loss):
+        if loss_meter.value()[0] > previous_loss:
             lr = lr * opt.lr_decay
             # 第二种降低学习率的方法:不会有moment等信息的丢失
             for param_group in optimizer.param_groups:
