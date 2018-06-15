@@ -15,7 +15,7 @@ class BasicModule(t.nn.Module):
 
     def __init__(self):
         super(BasicModule,self).__init__()
-        self.model_name=str(type(self))# 默认名字
+        self.model_name=str(type(self)) # 默认名字
 
     def load(self, path):
         '''

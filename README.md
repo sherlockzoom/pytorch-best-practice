@@ -1,9 +1,31 @@
+# 实验环境
 + python3.5
 + pytorch 0.4
++ ubuntu16.04
+
+---
 
 > 4GPU运行，batch_size过大可能出现溢出 
 
 ![](data/gpustat.png)
+
+# 多GPU
+
+`torch.nn.DataParallel`: torch多GPU
+
+查看DataParallel定义: `class DataParallel(Module):` DataParallel是Module子类
+在本实验中自定义了`models/BasicModule`扩展了save/load方法，因此定义了MulGPUDataParallel类
+
+```
+class MulGPUDataParallel(DataParallel, BasicModule):
+    pass
+```
+
+存在的问题：
+
+1. 模型保存的命名有误(eg: ` <class 'models.mul_gpu.MulGPUDataParallel'>_0615_09:53:32.pth`)，原始代码默认按照 model_name + time 进行保存，这里自定义了MulGPUDataParallel 之后，原始的model_name 发生了改变。
+
+可能的解决方法： 1）直接定义 BasicModule.model_name  2） 或者考虑在MulGPUDataParallel类中获取相关的model_name
 
 ---
 
